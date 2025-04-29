@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from "react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 
 const HomePage = () => {
   const [images, setImages] = useState<any[]>([])
   const [page, setPage] = useState(1)
+  const router = useRouter() // Initialize router
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -27,17 +29,25 @@ const HomePage = () => {
     }
   }
 
+  const handleImageClick = (id: number) => {
+    router.push(`/edit/${id}`) // Navigate to the edit page for the clicked image
+  }
+
   return (
     <div>
       <h1>Image Gallery</h1>
       <div>
         {images.map((image) => (
-          <div key={image.id}>
+          <div
+            key={image.id}
+            onClick={() => handleImageClick(image.id)}
+            data-testid={`image-container-${image.id}`} // Add test ID for easier testing
+          >
             <Image
               src={image.download_url}
               alt={`Image by ${image.author}`}
-              width={500} // Set the width you need (Next.js will optimize)
-              height={300} // Set the height you need
+              width={500}
+              height={300}
             />
             <p>By: {image.author}</p>
           </div>

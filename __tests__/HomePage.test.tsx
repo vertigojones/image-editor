@@ -1,5 +1,13 @@
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react"
+import { render, screen, fireEvent, act } from "@testing-library/react"
 import HomePage from "../app/page"
+import { useRouter } from "next/navigation"
+
+// Mock Next.js router properly
+jest.mock("next/navigation", () => ({
+  useRouter: jest.fn(() => ({
+    push: jest.fn(),
+  })),
+}))
 
 // Mock fetch globally
 global.fetch = jest.fn(() =>
@@ -94,5 +102,32 @@ describe("HomePage", () => {
 
     // Ensure exactly 10 images are displayed
     expect(images.length).toBe(10)
+  })
+
+  // Scenario 2: User clicks on an image to navigate to the edit page
+  test("navigates to the edit page when an image is clicked", async () => {
+    // Get the mocked router with its push function
+    const mockPush = jest.fn()
+    ;(useRouter as jest.Mock).mockReturnValue({
+      push: mockPush,
+    })
+
+    await act(async () => {
+      render(<HomePage />)
+    })
+
+    // Wait for images to load
+    const imageContainers = await screen.findAllByTestId(/image-container-/)
+
+    // Make sure we found our image containers
+    expect(imageContainers.length).toBeGreaterThan(0)
+
+    // Simulate a click on the first image container (which has ID 1)
+    await act(async () => {
+      fireEvent.click(imageContainers[0])
+    })
+
+    // Verify if the router push function is called with the correct URL
+    expect(mockPush).toHaveBeenCalledWith("/edit/1")
   })
 })
