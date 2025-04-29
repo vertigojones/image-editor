@@ -1,3 +1,3 @@
 module.exports = {
-  default: `--require features/step_definitions/**/*.ts --publish-quiet`,
+  require: ["ts-node/register", "features/step_definitions/**/*.ts"],
 }

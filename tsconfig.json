@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -15,13 +11,8 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+    "jsx": "react-jsx",
+    "incremental": true
   },
   "include": [
     "next-env.d.ts",
@@ -29,8 +20,9 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "./app",
-    "./features"
-  ],
+    "./features",
+    "./__tests__"
+, "config/jest.setup.tsx"  ],
   "exclude": [
     "node_modules"
   ]
