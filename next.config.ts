@@ -1,9 +1,14 @@
-import type { NextConfig } from "next"
+// next.config.js
 
-const nextConfig: NextConfig = {
+module.exports = {
   images: {
-    domains: ["picsum.photos"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
 }
-
-export default nextConfig
