@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, act } from "@testing-library/react"
-import EditImagePage from "../app/edit/page"
+import EditImagePage from "../app/edit/[id]/page"
 import { useRouter } from "next/navigation"
 
 // Mock Next.js navigation properly
