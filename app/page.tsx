@@ -5,11 +5,12 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 
 const HomePage = () => {
-  const [images, setImages] = useState<any[]>([])
-  const [page, setPage] = useState(1)
-  const [loading, setLoading] = useState(true)
+  const [images, setImages] = useState<any[]>([]) // Array of images fetched from Picsum API
+  const [page, setPage] = useState(1) // Pagination state
+  const [loading, setLoading] = useState(true) // Loading indicator
   const router = useRouter()
 
+  // Fetch images from the Picsum API whenever the page number changes
   useEffect(() => {
     const fetchImages = async () => {
       setLoading(true)
@@ -29,6 +30,7 @@ const HomePage = () => {
     fetchImages()
   }, [page])
 
+  // Handle pagination controls: update the page number and scroll to top
   const handlePagination = (direction: string) => {
     if (direction === "next") {
       setPage(page + 1)
@@ -39,11 +41,12 @@ const HomePage = () => {
     }
   }
 
+  // Navigate to the Edit Image page with the selected image ID
   const handleImageClick = (id: number) => {
     router.push(`/edit/${id}`)
   }
 
-  // Carousel scrolling
+  // Scroll the horizontal carousel left
   const scrollLeft = () => {
     const container = document.getElementById("image-carousel")
     if (container) {
@@ -51,6 +54,7 @@ const HomePage = () => {
     }
   }
 
+  // Scroll the horizontal carousel right
   const scrollRight = () => {
     const container = document.getElementById("image-carousel")
     if (container) {
@@ -61,15 +65,17 @@ const HomePage = () => {
   return (
     <main className="min-h-screen w-full py-8 px-4 bg-background">
       <div className="max-w-7xl mx-auto">
+        {/* Title */}
         <h1 className="text-3xl font-bold text-center mb-6 text-foreground">
           Image Gallery
         </h1>
 
-        {/* Horizontal Carousel */}
+        {/* Image Carousel Section */}
         <div className="mb-10">
+          {/* Carousel Header with Scroll Buttons */}
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-foreground">
-              Horizontal Carousel
+              Image Carousel
             </h2>
             <div className="flex gap-2">
               <button
@@ -77,6 +83,7 @@ const HomePage = () => {
                 className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors"
                 aria-label="Scroll left"
               >
+                {/* Left arrow icon */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -97,6 +104,7 @@ const HomePage = () => {
                 className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors"
                 aria-label="Scroll right"
               >
+                {/* Right arrow icon */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -115,6 +123,7 @@ const HomePage = () => {
             </div>
           </div>
 
+          {/* Show spinner while loading, otherwise render carousel */}
           {loading ? (
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-500"></div>
@@ -125,6 +134,7 @@ const HomePage = () => {
               className="flex overflow-x-auto pb-4 gap-4 scrollbar-hide snap-x scroll-smooth"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
+              {/* Render each image card in the carousel */}
               {images.map((image) => (
                 <div
                   key={image.id}
@@ -132,6 +142,7 @@ const HomePage = () => {
                   data-testid={`carousel-image-${image.id}`}
                   className="flex-shrink-0 w-64 snap-start bg-background border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 cursor-pointer"
                 >
+                  {/* Image wrapper */}
                   <div className="relative h-40 w-full">
                     <Image
                       src={image.download_url}
@@ -141,6 +152,7 @@ const HomePage = () => {
                       className="object-cover"
                     />
                   </div>
+                  {/* Image metadata */}
                   <div className="p-3">
                     <p className="text-foreground font-medium truncate">
                       By: {image.author}
@@ -157,6 +169,7 @@ const HomePage = () => {
 
         {/* Pagination Controls */}
         <div className="flex justify-center gap-4 py-4">
+          {/* Previous Page Button */}
           <button
             onClick={() => handlePagination("previous")}
             disabled={page <= 1 || loading}
@@ -168,9 +181,13 @@ const HomePage = () => {
           >
             Previous Page
           </button>
+
+          {/* Page Indicator */}
           <span className="flex items-center px-4 py-2 bg-gray-100 rounded text-foreground">
             Page {page}
           </span>
+
+          {/* Next Page Button */}
           <button
             onClick={() => handlePagination("next")}
             disabled={loading}
