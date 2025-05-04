@@ -53,6 +53,21 @@ npm test           # to run all tests
 - `/app` - Next.js app directory structure with pages like `/page.tsx` and `/edit/[id]/page.tsx`
 - `/__tests__` - Test suite for the HomePage and EditImagePage
 
+## Further Refinements
+
+- Refactor and componentize the code even further.
+- Add mock and test to check `img.src` is set to the correct filtered URL (ensuring transformations are applied).
+- Use query parameters (e.g., ?page=3) to persist pagination across refreshes and back-navigation instead of sessionStorage.
+- Add better focus outlines for interactive elements.
+- Improve screen reader support with ARIA labels and landmark roles.
+- Consider using zod or io-ts for runtime validation of API responses.
+- Add integration tests for the edit workflow.
+- Support mouse dragging or touch swiping to improve usability on touch devices for the carousel.
+- Implement smarter image preloading and memoization strategies for improved performance when navigating back and forth between pages.
+- Introduce subtle page or image load transitions using framer-motion or CSS animations to enhance polish.
+- Add support for system preference detection (prefers-color-scheme) or a toggle in the UI.
+- Add a service worker (e.g., with next-pwa) to support offline image browsing or editing.
+
 ## Author
 
 Owen Liversidge
