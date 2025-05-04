@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import Image from "next/image"
+import type { ImageData } from "../../../types/image"
 
 const EditImagePage = () => {
   const router = useRouter()
@@ -10,7 +11,7 @@ const EditImagePage = () => {
   const id = params?.id as string // Get the image ID from the route parameters
 
   // Editable state for image settings
-  const [image, setImage] = useState<any>(null)
+  const [image, setImage] = useState<ImageData | null>(null)
   const [width, setWidth] = useState(500)
   const [height, setHeight] = useState(300)
   const [greyscale, setGreyscale] = useState(false)
@@ -54,25 +55,40 @@ const EditImagePage = () => {
     return url
   }
 
-  // Persist settings to localStorage on changes
-  const saveSettingsToLocalStorage = () => {
-    const settings = { width, height, greyscale, blur }
-    localStorage.setItem(`image-${id}-settings`, JSON.stringify(settings))
-  }
-
   // Save settings whenever they change
   useEffect(() => {
+    const saveSettingsToLocalStorage = () => {
+      const settings = { width, height, greyscale, blur }
+      localStorage.setItem(`image-${id}-settings`, JSON.stringify(settings))
+    }
+
     saveSettingsToLocalStorage()
-  }, [width, height, greyscale, blur])
+  }, [width, height, greyscale, blur, id])
 
   // Download image using a canvas
   const handleDownload = () => {
-    const link = document.createElement("a")
-    link.href = applyFilters()
-    link.download = `edited-image-${id}.jpg`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    const canvas = document.createElement("canvas")
+    const ctx = canvas.getContext("2d")
+    const img = document.createElement("img")
+
+    img.crossOrigin = "anonymous" // 👈 Important: avoid canvas tainting
+    img.src = applyFilters()
+
+    img.onload = () => {
+      canvas.width = img.width
+      canvas.height = img.height
+      ctx?.drawImage(img, 0, 0)
+
+      const dataUrl = canvas.toDataURL("image/jpeg") // or "image/png"
+      const a = document.createElement("a")
+      a.href = dataUrl
+      a.download = `edited-image-${id}.jpg`
+      a.click()
+    }
+
+    img.onerror = () => {
+      alert("Failed to load image for download. Please try again.")
+    }
   }
 
   // Navigate back to homepage
