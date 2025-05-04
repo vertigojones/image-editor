@@ -87,24 +87,6 @@ const EditImagePage = () => {
     <div>
       <h1>Edit Image</h1>
       <div>
-        <div
-          style={{
-            position: "relative",
-            width: `${width}px`,
-            height: `${height}px`,
-          }}
-        >
-          <Image
-            src={applyFilters()}
-            alt={`Image by ${image.author}`}
-            fill
-            sizes="100vw"
-            style={{ objectFit: "cover" }}
-          />
-        </div>
-        <p>By: {image.author}</p>
-      </div>
-      <div>
         <label>
           Width:
           <input
@@ -141,6 +123,24 @@ const EditImagePage = () => {
         </label>
         <button onClick={handleDownload}>Download Edited Image</button>
         <button onClick={handleBackToGallery}>Back to Gallery</button>
+      </div>
+      <div>
+        <p>By: {image.author}</p>
+        <div
+          style={{
+            position: "relative",
+            width: `${width}px`,
+            height: `${height}px`,
+          }}
+        >
+          <Image
+            src={applyFilters()}
+            alt={`Image by ${image.author}`}
+            fill
+            sizes="100vw"
+            style={{ objectFit: "cover" }}
+          />
+        </div>
       </div>
     </div>
   )
