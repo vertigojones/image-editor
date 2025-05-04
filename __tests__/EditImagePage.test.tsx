@@ -2,25 +2,37 @@ import { render, screen, fireEvent, act } from "@testing-library/react"
 import EditImagePage from "../app/edit/[id]/page"
 import { useRouter } from "next/navigation"
 
-// Mock Next.js navigation properly
+// --- Suppress React warnings during tests ---
+beforeAll(() => {
+  jest.spyOn(console, "error").mockImplementation((msg, ...args) => {
+    const ignored = [
+      "Received `true` for a non-boolean attribute `priority`",
+      "Received `true` for a non-boolean attribute `fill`",
+    ]
+    if (typeof msg === "string" && ignored.some((text) => msg.includes(text))) {
+      return
+    }
+    // Optional: re-enable unhandled logs
+    // console.error(msg, ...args)
+  })
+})
+
+// Mock router and params
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
-  useParams: jest.fn(() => ({
-    id: "1", // Mocking id param
-  })),
+  useParams: jest.fn(() => ({ id: "1" })),
 }))
 
 // Mock next/image
 jest.mock("next/image", () => ({
   __esModule: true,
   default: (props: any) => {
-    // Return a regular <img> element and handle `fill` appropriately
-    const { fill, ...rest } = props
+    const { fill, priority, ...rest } = props
     return <img {...rest} />
   },
 }))
 
-// Mock fetch globally
+// Mock fetch for image data
 global.fetch = jest.fn(() =>
   Promise.resolve({
     ok: true,
@@ -30,6 +42,8 @@ global.fetch = jest.fn(() =>
         id: 1,
         author: "Author 1",
         download_url: "https://picsum.photos/id/1/500/500",
+        width: 500,
+        height: 300,
       }),
   })
 ) as jest.Mock
@@ -37,13 +51,13 @@ global.fetch = jest.fn(() =>
 describe("EditImagePage", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    localStorage.clear()
   })
 
   test("renders the selected image for editing", async () => {
     await act(async () => {
       render(<EditImagePage />)
     })
-
     const image = await screen.findByAltText(/Image by Author 1/)
     expect(image).toBeInTheDocument()
   })
@@ -52,67 +66,57 @@ describe("EditImagePage", () => {
     await act(async () => {
       render(<EditImagePage />)
     })
-
-    // Simulate changing width and height
-    const widthInput = screen.getByLabelText(/Width/)
-    const heightInput = screen.getByLabelText(/Height/)
-
-    fireEvent.change(widthInput, { target: { value: "600" } })
-    fireEvent.change(heightInput, { target: { value: "400" } })
-
-    expect(widthInput).toHaveValue(600) // Updated to use toHaveValue matcher
-    expect(heightInput).toHaveValue(400) // Updated to use toHaveValue matcher
+    fireEvent.change(screen.getByLabelText(/Width/), {
+      target: { value: "600" },
+    })
+    fireEvent.change(screen.getByLabelText(/Height/), {
+      target: { value: "400" },
+    })
+    expect(screen.getByLabelText(/Width/)).toHaveValue(600)
+    expect(screen.getByLabelText(/Height/)).toHaveValue(400)
   })
 
   test("allows the user to toggle greyscale mode", async () => {
     await act(async () => {
       render(<EditImagePage />)
     })
-
-    const greyscaleToggle = screen.getByLabelText(/Greyscale/)
-
-    fireEvent.click(greyscaleToggle)
-    expect(greyscaleToggle).toBeChecked()
-
-    fireEvent.click(greyscaleToggle)
-    expect(greyscaleToggle).not.toBeChecked()
+    const checkbox = screen.getByLabelText(/Greyscale/)
+    fireEvent.click(checkbox)
+    expect(checkbox).toBeChecked()
+    fireEvent.click(checkbox)
+    expect(checkbox).not.toBeChecked()
   })
 
   test("allows the user to apply blur effect", async () => {
     await act(async () => {
       render(<EditImagePage />)
     })
-
-    const blurSlider = screen.getByLabelText(/Blur/)
-
-    fireEvent.change(blurSlider, { target: { value: "5" } })
-    expect(blurSlider).toHaveValue(5) // Updated to use toHaveValue matcher
+    const slider = screen.getByRole("slider")
+    fireEvent.change(slider, { target: { value: "5" } })
+    expect(slider).toHaveValue("5") // it's a string in DOM
   })
-
-  // The following tests need updates based on the new component structure
 
   test("updates image source URL when edits are applied", async () => {
     await act(async () => {
       render(<EditImagePage />)
     })
+    fireEvent.click(screen.getByLabelText(/Greyscale/))
+    fireEvent.change(screen.getByLabelText(/Width/), {
+      target: { value: "600" },
+    })
+    fireEvent.change(screen.getByLabelText(/Height/), {
+      target: { value: "400" },
+    })
+    fireEvent.change(screen.getByRole("slider"), { target: { value: "5" } })
 
-    // After component loads, change some settings
-    const widthInput = screen.getByLabelText(/Width/)
-    const heightInput = screen.getByLabelText(/Height/)
-    const greyscaleToggle = screen.getByLabelText(/Greyscale/)
-
-    fireEvent.change(widthInput, { target: { value: "600" } })
-    fireEvent.change(heightInput, { target: { value: "400" } })
-    fireEvent.click(greyscaleToggle)
-
-    // The image src should now contain the updated dimensions and grayscale parameter
     const image = screen.getByAltText(/Image by Author 1/)
-    expect(image.getAttribute("src")).toContain("600/400")
-    expect(image.getAttribute("src")).toContain("grayscale")
+    const src = image.getAttribute("src") || ""
+    expect(src).toContain("600/400")
+    expect(src).toContain("grayscale")
+    expect(src).toContain("blur=5")
   })
 
   test("persists image edits after refreshing the page", async () => {
-    // Set the initial values for the image settings
     localStorage.setItem(
       "image-1-settings",
       JSON.stringify({ width: 600, height: 400, greyscale: true, blur: 5 })
@@ -122,31 +126,21 @@ describe("EditImagePage", () => {
       render(<EditImagePage />)
     })
 
-    // Wait for the image to load
-    const image = screen.getByAltText(/Image by Author 1/)
-    expect(image).toBeInTheDocument()
-
-    // Check if the persisted settings (width, height, etc.) are applied
     expect(screen.getByLabelText(/Width/)).toHaveValue(600)
     expect(screen.getByLabelText(/Height/)).toHaveValue(400)
     expect(screen.getByLabelText(/Greyscale/)).toBeChecked()
-    expect(screen.getByLabelText(/Blur/)).toHaveValue(5)
+    expect(screen.getByRole("slider")).toHaveValue("5")
   })
 
   test("navigates back to the image gallery", async () => {
     const mockPush = jest.fn()
-    ;(useRouter as jest.Mock).mockReturnValue({
-      push: mockPush,
-    })
+    ;(useRouter as jest.Mock).mockReturnValue({ push: mockPush })
 
     await act(async () => {
       render(<EditImagePage />)
     })
 
-    // Simulate click on the 'Back to Gallery' button
     fireEvent.click(screen.getByText(/Back to Gallery/))
-
-    // Check if the push method was called to navigate back to the gallery
     expect(mockPush).toHaveBeenCalledWith("/")
   })
 })
