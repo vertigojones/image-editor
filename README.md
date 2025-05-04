@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Image Editor App
 
-## Getting Started
+A lightweight Next.js application using Tailwind CSS and TypeScript that allows users to:
+- Browse images from [Lorem Picsum](https://picsum.photos/)
+- View them in a horizontal carousel
+- Click an image to edit it
+- Apply effects (greyscale, blur), change dimensions
+- Download the edited version
+- Navigate across paginated image sets
 
-First, run the development server:
+## Features
+
+### Homepage
+- Fetches and displays images from the public Lorem Picsum API.
+- Implements horizontal scrolling (carousel) for visual navigation.
+- Pagination controls allow moving forward/backward through image sets.
+- Images are clickable and redirect to the edit screen.
+
+### Edit Image Page
+- Loads image metadata based on URL ID.
+- Inputs for width and height with validation.
+- Toggle switch for greyscale.
+- Slider for blur (0–10).
+- Several quick presets (original, black & white, 4:3, 1:1).
+- "Download Edited Image" generates a canvas and triggers download.
+- All settings are persisted to `localStorage` for each image ID.
+
+## Technologies Used
+
+- **Next.js** (App Router, `use client`)
+- **React** (with hooks)
+- **Tailwind CSS** for responsive, utility-first design
+- **TypeScript** with strong typing and ESLint rules
+- **Jest** and **React Testing Library** for unit testing
+
+## Setup Instructions
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # for local development
+npm run build
+npm start          # to preview the production build
+npm test           # to run all tests
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Testing Notes
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- All image editing settings are tested: dimension updates, filter toggling, persistence.
+- `window.scrollTo` is stubbed out during test to avoid JSDOM errors.
+- The download functionality is fully mocked using DOM stubs for canvas and anchor elements.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Folder Structure
 
-## Learn More
+- `/app` - Next.js app directory structure with pages like `/page.tsx` and `/edit/[id]/page.tsx`
+- `/__tests__` - Test suite for the HomePage and EditImagePage
 
-To learn more about Next.js, take a look at the following resources:
+## Author
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Owen Liversidge
