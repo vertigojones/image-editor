@@ -5,12 +5,21 @@ import { useRouter, useParams } from "next/navigation"
 import Image from "next/image"
 import type { ImageData } from "../../../types/image"
 
+/**
+ * EditImagePage Component
+ * Allows users to:
+ * - View a selected image
+ * - Modify dimensions, greyscale, and blur
+ * - Preview the edited image live
+ * - Persist settings via localStorage
+ * - Download the transformed image
+ */
 const EditImagePage = () => {
   const router = useRouter()
   const params = useParams()
-  const id = params?.id as string // Get the image ID from the route parameters
+  const id = params?.id as string // Extract image ID from route
 
-  // Editable state for image settings
+  // --- Editable state for image and settings ---
   const [image, setImage] = useState<ImageData | null>(null)
   const [width, setWidth] = useState(500)
   const [height, setHeight] = useState(300)
@@ -18,7 +27,10 @@ const EditImagePage = () => {
   const [blur, setBlur] = useState(0)
   const [loading, setLoading] = useState(true)
 
-  // Fetch image details and restore saved settings on load
+  /**
+   * Fetch the selected image details
+   * and restore any saved settings on mount
+   */
   useEffect(() => {
     const fetchImage = async () => {
       setLoading(true)
@@ -35,19 +47,22 @@ const EditImagePage = () => {
 
     if (id) {
       fetchImage()
-    }
 
-    const savedSettings = localStorage.getItem(`image-${id}-settings`)
-    if (savedSettings) {
-      const { width, height, greyscale, blur } = JSON.parse(savedSettings)
-      setWidth(width)
-      setHeight(height)
-      setGreyscale(greyscale)
-      setBlur(blur)
+      const savedSettings = localStorage.getItem(`image-${id}-settings`)
+      if (savedSettings) {
+        const { width, height, greyscale, blur } = JSON.parse(savedSettings)
+        setWidth(width)
+        setHeight(height)
+        setGreyscale(greyscale)
+        setBlur(blur)
+      }
     }
   }, [id])
 
-  // Construct image URL with current settings
+  /**
+   * Construct a filtered image URL
+   * based on user-selected parameters
+   */
   const applyFilters = () => {
     let url = `https://picsum.photos/id/${id}/${width}/${height}`
     if (greyscale) url += "?grayscale"
@@ -55,7 +70,9 @@ const EditImagePage = () => {
     return url
   }
 
-  // Save settings whenever they change
+  /**
+   * Persist settings to localStorage on change
+   */
   useEffect(() => {
     const saveSettingsToLocalStorage = () => {
       const settings = { width, height, greyscale, blur }
@@ -65,13 +82,15 @@ const EditImagePage = () => {
     saveSettingsToLocalStorage()
   }, [width, height, greyscale, blur, id])
 
-  // Download image using a canvas
+  /**
+   * Create a canvas, draw the image, and export as a download
+   */
   const handleDownload = () => {
     const canvas = document.createElement("canvas")
     const ctx = canvas.getContext("2d")
     const img = document.createElement("img")
 
-    img.crossOrigin = "anonymous" // 👈 Important: avoid canvas tainting
+    img.crossOrigin = "anonymous"
     img.src = applyFilters()
 
     img.onload = () => {
@@ -79,7 +98,7 @@ const EditImagePage = () => {
       canvas.height = img.height
       ctx?.drawImage(img, 0, 0)
 
-      const dataUrl = canvas.toDataURL("image/jpeg") // or "image/png"
+      const dataUrl = canvas.toDataURL("image/jpeg")
       const a = document.createElement("a")
       a.href = dataUrl
       a.download = `edited-image-${id}.jpg`
@@ -91,12 +110,12 @@ const EditImagePage = () => {
     }
   }
 
-  // Navigate back to homepage
+  // Return to the homepage
   const handleBackToGallery = () => {
     router.push("/")
   }
 
-  // Show spinner during loading
+  // --- Loading state ---
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -105,7 +124,7 @@ const EditImagePage = () => {
     )
   }
 
-  // Show fallback UI if image failed to load
+  // --- Error state ---
   if (!image) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -127,10 +146,11 @@ const EditImagePage = () => {
     )
   }
 
+  // --- Main render ---
   return (
     <main className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
+        {/* --- Header & Navigation --- */}
         <div className="flex items-center justify-between mb-6">
           <button
             onClick={handleBackToGallery}
@@ -155,12 +175,12 @@ const EditImagePage = () => {
           <h1 className="text-3xl font-bold text-center mb-6 text-foreground">
             Edit Image Page
           </h1>
-          <div className="w-24" /> {/* Spacer */}
+          <div className="w-24" /> {/* Spacer to balance layout */}
         </div>
 
-        {/* Main Layout: Left (image) and Right (controls) */}
+        {/* --- Main Content: Image + Editor --- */}
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Image Preview */}
+          {/* --- Image Preview --- */}
           <div className="lg:w-2/3 flex flex-col">
             <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-4">
               <div
@@ -178,7 +198,7 @@ const EditImagePage = () => {
               </div>
             </div>
 
-            {/* Author info and download */}
+            {/* --- Author Info + Download Button --- */}
             <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -213,7 +233,7 @@ const EditImagePage = () => {
             </div>
           </div>
 
-          {/* Editing Controls */}
+          {/* --- Control Panel --- */}
           <div className="lg:w-1/3">
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
               <h2 className="text-xl font-semibold mb-6 text-foreground">
@@ -221,7 +241,7 @@ const EditImagePage = () => {
               </h2>
 
               <div className="space-y-6">
-                {/* Dimension Inputs */}
+                {/* --- Size Inputs --- */}
                 <div>
                   <h3 className="text-sm font-medium text-foreground/80 mb-2">
                     Dimensions
@@ -260,13 +280,13 @@ const EditImagePage = () => {
                   </div>
                 </div>
 
-                {/* Filters: Greyscale + Blur */}
+                {/* --- Filters: Greyscale + Blur --- */}
                 <div>
                   <h3 className="text-sm font-medium text-foreground/80 mb-2">
                     Filters
                   </h3>
 
-                  {/* Greyscale toggle */}
+                  {/* Greyscale toggle switch */}
                   <div className="flex items-center justify-between py-3 border-b border-gray-100">
                     <label className="flex items-center cursor-pointer">
                       <span className="mr-3 text-foreground">Greyscale</span>
@@ -318,7 +338,7 @@ const EditImagePage = () => {
                   </div>
                 </div>
 
-                {/* Quick Presets */}
+                {/* --- Preset Buttons --- */}
                 <div>
                   <h3 className="text-sm font-medium text-foreground/80 mb-2">
                     Quick Presets
