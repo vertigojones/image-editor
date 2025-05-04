@@ -152,7 +152,9 @@ const EditImagePage = () => {
             </svg>
             Back to Gallery
           </button>
-          <h1 className="text-2xl font-bold text-foreground">Edit Image</h1>
+          <h1 className="text-3xl font-bold text-center mb-6 text-foreground">
+            Edit Image Page
+          </h1>
           <div className="w-24" /> {/* Spacer */}
         </div>
 
