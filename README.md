@@ -1,12 +1,25 @@
 # Image Editor App
 
 A lightweight Next.js application using Tailwind CSS and TypeScript that allows users to:
-- Browse images from [Lorem Picsum](https://picsum.photos/)
-- View them in a horizontal carousel
-- Click an image to edit it
-- Apply effects (greyscale, blur), change dimensions
-- Download the edited version
-- Navigate across paginated image sets
+- Browse images from the [Lorem Picsum API](https://picsum.photos/)
+- Pagination and horizontal carousel for image navigation
+- Edit images:
+  - Adjust width and height
+  - Toggle greyscale mode
+  - Apply blur (0–10)
+- Real-time image preview
+- Download edited images
+- Local storage persistence for edits
+- Session-based return-to-gallery page memory
+
+## Technical Decisions
+
+- **Next.js App Router** used for modern routing and layout patterns.
+- **Tailwind CSS** for rapid, consistent styling.
+- **TypeScript** with custom types (`ImageData`) to ensure type safety.
+- **React Testing Library + JSDOM** used for comprehensive unit tests.
+- Image downloads use a **canvas-based approach** to apply live transformations.
+
 
 ## Features
 
@@ -67,6 +80,15 @@ npm test           # to run all tests
 - Introduce subtle page or image load transitions using framer-motion or CSS animations to enhance polish.
 - Add support for system preference detection (prefers-color-scheme) or a toggle in the UI.
 - Add a service worker (e.g., with next-pwa) to support offline image browsing or editing.
+
+If this were a production app, I’d consider:
+
+- **Lazy loading** images for performance on large datasets.
+- **Drag-and-drop or file upload support** to allow user-added images.
+- **Undo/redo history** for editing changes.
+- Better **error UI** when the API fails.
+- Option to **copy direct link** to edited images.
+- Adding **E2E tests** with Cypress or Playwright.
 
 ## Author
 
