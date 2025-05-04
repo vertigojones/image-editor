@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, act } from "@testing-library/react"
-import EditImagePage from "../app/edit/[id]"
+import EditImagePage from "../app/edit/page"
 import { useRouter } from "next/navigation"
 
 // Mock Next.js navigation properly
@@ -14,8 +14,9 @@ jest.mock("next/navigation", () => ({
 jest.mock("next/image", () => ({
   __esModule: true,
   default: (props: any) => {
-    // eslint-disable-next-line jsx-a11y/alt-text
-    return <img {...props} />
+    // Return a regular <img> element and handle `fill` appropriately
+    const { fill, ...rest } = props
+    return <img {...rest} />
   },
 }))
 
