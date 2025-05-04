@@ -47,7 +47,6 @@ npm test           # to run all tests
 
 - All image editing settings are tested: dimension updates, filter toggling, persistence.
 - `window.scrollTo` is stubbed out during test to avoid JSDOM errors.
-- The download functionality is fully mocked using DOM stubs for canvas and anchor elements.
 
 ## Folder Structure
 
