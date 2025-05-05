@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import type { ImageData } from "../types/image"
 import { fetchImages, scrollCarousel } from "../utils/image-utils"
 import ImageCard from "./components/ImageCard"
+import { HomePageSkeleton } from "./components/HomePageSkeleton"
 
 /**
  * HomePage Component
@@ -121,26 +122,24 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* --- Carousel Content or Loader --- */}
-          {loading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-500"></div>
-            </div>
-          ) : (
-            <div
-              id="image-carousel"
-              className="flex overflow-x-auto pb-4 gap-4 scrollbar-hide snap-x scroll-smooth"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-            >
-              {images.map((image) => (
-                <ImageCard
-                  key={image.id}
-                  image={image}
-                  onClick={handleImageClick}
-                />
-              ))}
-            </div>
-          )}
+          {/* --- Carousel Content or Skeleton Loader --- */}
+          <div
+            id="image-carousel"
+            className="flex overflow-x-auto pb-4 gap-4 scrollbar-hide snap-x scroll-smooth"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {loading
+              ? Array.from({ length: 12 }).map((_, index) => (
+                  <HomePageSkeleton key={`skeleton-${index}`} />
+                ))
+              : images.map((image) => (
+                  <ImageCard
+                    key={image.id}
+                    image={image}
+                    onClick={handleImageClick}
+                  />
+                ))}
+          </div>
         </div>
 
         {/* --- Pagination Controls --- */}

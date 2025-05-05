@@ -71,6 +71,7 @@ npm test           # to run all tests
 ## Further Refinements
 
 - Refactor and componentize the code even further.
+- Refine the loading skeletons to be more targeted.
 - Add mock and test to check `img.src` is set to the correct filtered URL (ensuring transformations are applied).
 - Use query parameters (e.g., ?page=3) to persist pagination across refreshes and back-navigation instead of sessionStorage.
 - Add better focus outlines for interactive elements.
